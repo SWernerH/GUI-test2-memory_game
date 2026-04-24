@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Belize Memory Match — CMPS2212</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+  <header class="game-header">
+    <h1 class="game-title">Belize <span class="accent">Memory</span> Match</h1>
+    <p class="game-subtitle">Find all 18 pairs hidden across the reef.</p>
+  </header>
+
+  <main class="game-main">
+    <!--
+      HUD panel — rendered values are written by the UI layer.
+      The service layer emits events; the UI layer reads the service's
+      published state (via the callback payload) and writes here.
+      Do NOT read state directly from the service in the UI layer.
+    -->
+    <section class="hud" aria-label="Game status">
+      <div class="hud-stat">
+        <span class="hud-label">Moves</span>
+        <span class="hud-value" data-role="moves">0</span>
+      </div>
+      <div class="hud-stat">
+        <span class="hud-label">Time</span>
+        <span class="hud-value" data-role="timer">0:00</span>
+      </div>
+      <div class="hud-stat">
+        <span class="hud-label">Matched</span>
+        <span class="hud-value" data-role="matched">0 / 18</span>
+      </div>
+      <button type="button" class="btn-restart" data-role="restart">
+        New Game
+      </button>
+    </section>
+
+    <!--
+      Board container. The UI layer populates this with 36 card nodes
+      when the service emits 'game:started'.
+    -->
+    <section
+      class="board"
+      data-role="board"
+      aria-label="Memory game board"
+    ></section>
+
+    <!-- Win overlay — UI layer toggles the .is-visible class on 'game:won' -->
+    <div class="win-overlay" data-role="win-overlay" aria-hidden="true">
+      <div class="win-card">
+        <h2>Ajay! You matched every pair.</h2>
+        <p class="win-stats">
+          <span data-role="win-moves">0</span> moves
+          &middot;
+          <span data-role="win-time">0:00</span>
+        </p>
+        <button type="button" class="btn-restart" data-role="play-again">
+          Play Again
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="game-footer">
+    <small>CMPS2212 &middot; University of Belize &middot; Observer Pattern (Stew Cashew)</small>
+  </footer> 
+</body>
+</html>

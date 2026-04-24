@@ -1,0 +1,326 @@
+/* ==========================================================================
+   Belize Memory Match — Styles
+   Aesthetic: Caribbean reef, deep teal + coral + sand, editorial typography.
+   Students: you do not need to modify this file. Focus on the JS layers.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+/* ---------- Design tokens ------------------------------------------------ */
+:root {
+  --reef-deep:    #0b3b4a;
+  --reef-mid:     #115c6e;
+  --reef-surface: #1a8299;
+  --sand:         #f4ecd8;
+  --sand-warm:    #e8dcc0;
+  --coral:        #e8704a;
+  --coral-bright: #ff8a5c;
+  --hibiscus:     #c9345b;
+  --ink:          #0a1f26;
+  --ink-soft:     #2d4a54;
+  --card-back:    linear-gradient(135deg, #115c6e 0%, #1a8299 60%, #0b3b4a 100%);
+  --card-face:    #fffdf7;
+
+  --shadow-sm: 0 1px 2px rgba(10, 31, 38, 0.08);
+  --shadow-md: 0 4px 16px rgba(10, 31, 38, 0.12);
+  --shadow-lg: 0 12px 40px rgba(10, 31, 38, 0.20);
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body:    'Fraunces', Georgia, serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* ---------- Reset -------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+button { font: inherit; cursor: pointer; }
+
+/* ---------- Page shell --------------------------------------------------- */
+body {
+  min-height: 100vh;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 15% 10%, rgba(26, 130, 153, 0.18), transparent 40%),
+    radial-gradient(circle at 85% 90%, rgba(232, 112, 74, 0.15), transparent 45%),
+    var(--sand);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1.5rem;
+}
+
+/* ---------- Header ------------------------------------------------------- */
+.game-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  max-width: 640px;
+}
+
+.game-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  letter-spacing: -0.02em;
+  margin: 0 0 0.4rem;
+  color: var(--reef-deep);
+  font-variation-settings: 'opsz' 144;
+}
+
+.game-title .accent {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--coral);
+}
+
+.game-subtitle {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+  font-style: italic;
+}
+
+/* ---------- HUD ---------------------------------------------------------- */
+.game-main {
+  width: 100%;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.hud {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: var(--card-face);
+  border: 1px solid rgba(10, 31, 38, 0.08);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.hud-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.hud-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink-soft);
+}
+
+.hud-value {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.5rem;
+  color: var(--reef-deep);
+  font-variant-numeric: tabular-nums;
+}
+
+.btn-restart {
+  background: var(--coral);
+  color: var(--sand);
+  border: none;
+  padding: 0.7rem 1.4rem;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-restart:hover {
+  background: var(--coral-bright);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-restart:active { transform: translateY(0); }
+
+.btn-restart:focus-visible {
+  outline: 3px solid var(--reef-surface);
+  outline-offset: 2px;
+}
+
+/* ---------- Board -------------------------------------------------------- */
+.board {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.6rem;
+  padding: 1rem;
+  background: var(--card-face);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+/* ---------- Card (students emit these nodes from the UI layer) ---------- */
+/*
+  Expected card DOM produced by the UI layer:
+
+  <button class="card" data-card-id="<id>" type="button">
+    <div class="card-inner">
+      <div class="card-face card-back"></div>
+      <div class="card-face card-front"><span>🦜</span></div>
+    </div>
+  </button>
+
+  Toggle classes on the .card element:
+    - .is-flipped   → card is face-up (shows front via 3D flip)
+    - .is-matched   → card has been matched (front visible with glow)
+*/
+
+.card {
+  /* Targeted button reset — do NOT use `all: unset`. */
+  appearance: none;
+  -webkit-appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  /* Perspective must be on the parent of the rotating element. */
+  perspective: 1000px;
+}
+
+.card:focus-visible {
+  outline: 3px solid var(--coral);
+  outline-offset: 3px;
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.card.is-flipped .card-inner,
+.card.is-matched .card-inner {
+  transform: rotateY(180deg);
+}
+
+.card-face {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  /* Hide the face when it's rotated away from the viewer. */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* ---- BACK (flat light purple, shown by default) ---- */
+.card-back {
+  background: #c7b8e6;
+}
+
+/* ---- FRONT (rotated 180deg, revealed when .card-inner flips) ---- */
+.card-front {
+  background: var(--sand);
+  border: 1px solid rgba(10, 31, 38, 0.08);
+  transform: rotateY(180deg);
+}
+
+.card-front span {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  line-height: 1;
+}
+
+.card.is-matched .card-front {
+  background: linear-gradient(135deg, #fff8e8 0%, #f9e8c8 100%);
+  box-shadow: 0 0 0 2px var(--coral), var(--shadow-md);
+}
+
+.card.is-matched { cursor: default; }
+
+/* ---------- Win overlay -------------------------------------------------- */
+.win-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 31, 38, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(6px);
+  z-index: 100;
+}
+
+.win-overlay.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.win-card {
+  background: var(--card-face);
+  padding: 2.5rem 3rem;
+  border-radius: var(--radius-lg);
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  max-width: 420px;
+  animation: win-rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes win-rise {
+  from { transform: translateY(20px) scale(0.95); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.win-card h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.8rem;
+  color: var(--reef-deep);
+  margin: 0 0 0.5rem;
+}
+
+.win-stats {
+  font-family: var(--font-mono);
+  color: var(--ink-soft);
+  margin: 0 0 1.5rem;
+  font-size: 0.95rem;
+}
+
+/* ---------- Footer ------------------------------------------------------- */
+.game-footer {
+  margin-top: 2rem;
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+/* ---------- Responsive --------------------------------------------------- */
+@media (max-width: 640px) {
+  .hud { grid-template-columns: repeat(3, 1fr); }
+  .btn-restart { grid-column: 1 / -1; }
+  .board { gap: 0.4rem; padding: 0.6rem; }
+  .card-front span { font-size: 1.4rem; }
+}
