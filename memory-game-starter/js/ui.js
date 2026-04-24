@@ -88,13 +88,29 @@ export function createUI(eventBus, gameService, rootEl) {
    * symbol. Treat all payload data as untrusted on principle.
    */
   function buildCardElement(card) {
-    // TODO (1):
-    //   - Create a <button> with class "card", type="button",
-    //     and data-card-id set to card.id.
-    //   - Build the nested .card-inner, .card-back, .card-front, <span>.
-    //   - Set the span's textContent to card.symbol.
-    //   - Return the button element.
+    const button = document.createElement('button');
+    button.className = 'card';
+    button.type = 'button';
+    button.setAttribute('data-card-id', card.id);
 
+    const inner = document.createElement('div');
+    inner.className = 'card-inner';
+
+    const back = document.createElement('div');
+    back.className = 'card-face card-back';
+
+    const front = document.createElement('div');
+    front.className = 'card-face card-front';
+
+    const span = document.createElement('span');
+    span.textContent = card.symbol;
+
+    front.appendChild(span);
+    inner.appendChild(back);
+    inner.appendChild(front);
+    button.appendChild(inner);
+
+    return button;
   }
 
   /**
@@ -102,51 +118,44 @@ export function createUI(eventBus, gameService, rootEl) {
    * Called on 'game:started'.
    */
   function renderBoard(cards) {
-    // TODO (2):
-    //   - Clear els.board (replaceChildren with nothing is fine).
-    //   - For each card, build its element and append.
-    //   - For performance, build into a DocumentFragment first, then
-    //     append the fragment once.
-
+    els.board.replaceChildren();
+    const fragment = document.createDocumentFragment();
+    cards.forEach(card => {
+      fragment.appendChild(buildCardElement(card));
+    });
+    els.board.appendChild(fragment);
   }
 
   /**
    * Reset the HUD for a new game.
    */
   function resetHud(totalPairs) {
-    // TODO (3):
-    //   - Set moves display to "0".
-    //   - Set timer display to "0:00".
-    //   - Set matched display to `0 / ${totalPairs}`.
-
+    els.moves.textContent = '0';
+    els.timer.textContent = '0:00';
+    els.matched.textContent = `0 / ${totalPairs}`;
   }
 
   function updateMoves(moves) {
-    // TODO (4): set els.moves.textContent to moves (coerced to string).
-
+    els.moves.textContent = String(moves);
   }
 
   function updateTimer(elapsedSeconds) {
-    // TODO (5): set els.timer.textContent using formatTime(elapsedSeconds).
-
+    els.timer.textContent = formatTime(elapsedSeconds);
   }
 
   function updateMatchedCount(matchedCardCount) {
-    // TODO (6):
-    //   - matchedCardCount is CARDS matched, not pairs. Divide by 2.
-    //   - Set els.matched.textContent to `${pairs} / ${TOTAL_PAIRS}`.
-
+    const pairs = matchedCardCount / 2;
+    els.matched.textContent = `${pairs} / ${TOTAL_PAIRS}`;
   }
 
   /**
    * Find the card element by id and add the .is-flipped class.
    */
   function flipCardFaceUp(cardId) {
-    // TODO (7):
-    //   - Query els.board for `[data-card-id="${cardId}"]`.
-    //   - If found, add the 'is-flipped' class.
-    //   - Guard against missing nodes (don't throw if the element is gone).
-
+    const cardEl = els.board.querySelector(`[data-card-id="${cardId}"]`);
+    if (cardEl) {
+      cardEl.classList.add('is-flipped');
+    }
   }
 
   /**
@@ -154,9 +163,10 @@ export function createUI(eventBus, gameService, rootEl) {
    * permanently, so we keep .is-flipped AND add .is-matched.
    */
   function markCardsMatched(firstId, secondId) {
-    // TODO (8): add 'is-matched' class to both cards' elements.
-    //           (They already have 'is-flipped' from the earlier event.)
-
+    const firstEl = els.board.querySelector(`[data-card-id="${firstId}"]`);
+    const secondEl = els.board.querySelector(`[data-card-id="${secondId}"]`);
+    if (firstEl) firstEl.classList.add('is-matched');
+    if (secondEl) secondEl.classList.add('is-matched');
   }
 
   /**
@@ -164,24 +174,22 @@ export function createUI(eventBus, gameService, rootEl) {
    * Called on 'game:matchFailed' via setTimeout.
    */
   function flipCardsFaceDown(firstId, secondId) {
-    // TODO (9): remove 'is-flipped' from both card elements.
-
+    const firstEl = els.board.querySelector(`[data-card-id="${firstId}"]`);
+    const secondEl = els.board.querySelector(`[data-card-id="${secondId}"]`);
+    if (firstEl) firstEl.classList.remove('is-flipped');
+    if (secondEl) secondEl.classList.remove('is-flipped');
   }
 
   function showWinOverlay(moves, elapsedSeconds) {
-    // TODO (10):
-    //   - Set els.winMoves.textContent to moves.
-    //   - Set els.winTime.textContent to formatTime(elapsedSeconds).
-    //   - Add 'is-visible' class to els.winOverlay.
-    //   - Set aria-hidden="false" on els.winOverlay.
-
+    els.winMoves.textContent = String(moves);
+    els.winTime.textContent = formatTime(elapsedSeconds);
+    els.winOverlay.classList.add('is-visible');
+    els.winOverlay.setAttribute('aria-hidden', 'false');
   }
 
   function hideWinOverlay() {
-    // TODO (11):
-    //   - Remove 'is-visible' class from els.winOverlay.
-    //   - Set aria-hidden="true" on els.winOverlay.
-
+    els.winOverlay.classList.remove('is-visible');
+    els.winOverlay.setAttribute('aria-hidden', 'true');
   }
 
   // -------------------------------------------------------------------------
@@ -193,20 +201,14 @@ export function createUI(eventBus, gameService, rootEl) {
    * figure out which card was clicked via the event target.
    */
   function onBoardClick(domEvent) {
-    // TODO (12):
-    //   - Find the closest .card ancestor of domEvent.target using
-    //     .closest('.card'). If none, return.
-    //   - Read its data-card-id attribute, convert to Number.
-    //   - Call gameService.flipCard(id).
-    //
-    //   DO NOT check any game rules here. The service decides whether
-    //   a flip is valid. The UI just forwards the intent.
-
+    const cardEl = domEvent.target.closest('.card');
+    if (!cardEl) return;
+    const id = Number(cardEl.getAttribute('data-card-id'));
+    gameService.flipCard(id);
   }
 
   function onRestartClick() {
-    // TODO (13): call gameService.restart().
-
+    gameService.restart();
   }
 
   // -------------------------------------------------------------------------
@@ -223,16 +225,22 @@ export function createUI(eventBus, gameService, rootEl) {
   }
 
   function wireSubscriptions() {
-    // TODO (14): subscribe to every event in the contract above.
-    //   Each subscription should call the corresponding renderer with
-    //   the right fields from the payload.
-    //
-    //   Example (do this for each event):
-    //     subscribe('game:moveCountChanged', ({ moves }) => updateMoves(moves));
-    //
-    //   For 'game:matchFailed', remember to setTimeout the flip-back
-    //   by FLIP_BACK_DELAY_MS before calling flipCardsFaceDown.
-
+    subscribe('game:started', ({ cards, totalPairs }) => {
+      renderBoard(cards);
+      resetHud(totalPairs);
+      hideWinOverlay();
+    });
+    subscribe('game:cardFlipped', ({ cardId }) => flipCardFaceUp(cardId));
+    subscribe('game:matchFound', ({ firstId, secondId, matchedCount }) => {
+      markCardsMatched(firstId, secondId);
+      updateMatchedCount(matchedCount);
+    });
+    subscribe('game:matchFailed', ({ firstId, secondId }) => {
+      setTimeout(() => flipCardsFaceDown(firstId, secondId), FLIP_BACK_DELAY_MS);
+    });
+    subscribe('game:moveCountChanged', ({ moves }) => updateMoves(moves));
+    subscribe('game:timerTick', ({ elapsedSeconds }) => updateTimer(elapsedSeconds));
+    subscribe('game:won', ({ moves, elapsedSeconds }) => showWinOverlay(moves, elapsedSeconds));
   }
 
   // -------------------------------------------------------------------------
